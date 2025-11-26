@@ -1,0 +1,10 @@
+services:
+  phpldapadmin:
+    image: osixia/phpldapadmin:latest
+    container_name: phpldapadmin
+    environment:
+      - PHPLDAPADMIN_LDAP_HOSTS=10.0.108.86
+      - PHPLDAPADMIN_HTTPS=false
+    ports:
+      - "8091:80"
+    restart: always
