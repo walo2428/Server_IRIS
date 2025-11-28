@@ -1,0 +1,16 @@
+---
+- name: Installer Cockpit
+  apt:
+    name: cockpit
+    state: present
+    update_cache: yes
+
+- name: Activer cockpit.socket
+  systemd:
+    name: cockpit.socket
+    state: started
+    enabled: true
+
+- name: Ouvrir le port 9090 dans le firewall (si UFW)
+  shell: ufw allow 9090
+  ignore_errors: yes
