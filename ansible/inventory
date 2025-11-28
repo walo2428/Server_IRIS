@@ -1,0 +1,2 @@
+[iris]
+10.0.108.163 ansible_user=vboxuser ansible_ssh_pass=walo1234@

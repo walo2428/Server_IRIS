@@ -1,0 +1,8 @@
+---
+- name: Deploiement Nextcloud + Cockpit pour serveur IRIS
+  hosts: iris
+  become: yes
+
+  roles:
+    - cockpit
+    - nextcloud
