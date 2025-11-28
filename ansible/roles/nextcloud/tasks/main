@@ -1,0 +1,72 @@
+---
+- name: Installer Docker + Docker Compose
+  apt:
+    name:
+      - docker.io
+      - docker-compose
+    state: present
+    update_cache: yes
+
+- name: Démarrer Docker
+  systemd:
+    name: docker
+    state: started
+    enabled: true
+
+- name: Créer le dossier Nextcloud
+  file:
+    path: /opt/nextcloud
+    state: directory
+    mode: '0755'
+
+- name: Déployer docker-compose Nextcloud
+  copy:
+    dest: /opt/nextcloud/docker-compose.yml
+    content: |
+      version: '3.8'
+
+      services:
+        db:
+          image: mariadb:latest
+          restart: always
+          command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
+          environment:
+            MYSQL_ROOT_PASSWORD: motdepasse_root
+            MYSQL_DATABASE: nextcloud
+            MYSQL_USER: nextclouduser
+            MYSQL_PASSWORD: motdepasse
+          volumes:
+            - db_data:/var/lib/mysql
+          networks:
+            - nextcloud_network
+
+        app:
+          image: nextcloud:latest
+          restart: always
+          ports:
+            - "8080:80"
+          environment:
+            MYSQL_HOST: db
+            MYSQL_DATABASE: nextcloud
+            MYSQL_USER: nextclouduser
+            MYSQL_PASSWORD: motdepasse
+          volumes:
+            - nextcloud_data:/var/www/html
+          depends_on:
+            - db
+          networks:
+            - nextcloud_network
+
+      volumes:
+        db_data:
+        nextcloud_data:
+
+      networks:
+        nextcloud_network:
+
+- name: Lancer Nextcloud (docker compose)
+  command: docker compose up -d --pull always
+  args:
+    chdir: /opt/nextcloud
+  become: yes
+
